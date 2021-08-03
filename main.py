@@ -1,7 +1,7 @@
 
 
 #in terminal
-#python3 -m pip install -U nupack -f ~/Downloads/nupack-VERSION/package
+#python3 -m pip install -U nupack -f ~/Downloads/nupack-4.0.0.27/package
 from Bio.Seq import Seq
 from nupack import *
 from test import *
@@ -9,7 +9,14 @@ from helper import *
 import numpy as np
 from random import randint
 import pandas as pd
+import matplotlib.pyplot as plt
+import forgi.visual.mplotlib as fvm
+import forgi
+import RNA
+import os
 
+path = "/home/samuel/Downloads/ResultsToehold"
+os.makedirs(path, exist_ok=True)
 '''''''''
 def random(s):
     length = len(s)
@@ -49,7 +56,7 @@ tail = displacement_miR(miRNA)[1]*"N"
 trigger = Domain(miRNA, name = "miRNA")
 free_tail = Domain(tail, name = "freetail")
 complement = Domain((mir_seq), name = "complement")
-test = Domain("N21", name = "test")
+
 c = Domain("N3", name = "c")
 d = Domain("W5", name = "d")
 loop = Domain(Loop , name = "loop")
@@ -57,7 +64,7 @@ g = Domain("W5" , name = "g")
 h = Domain("AUG" , name = "h")
 i = Domain("N11", name= "i")
 linker = Domain(Linker, name= "linker")
-
+#reporter = Domain(Reporter, name = "reporter")
 
 #Toehold Switch Complex - Define a estrutura do toehold
 
@@ -69,42 +76,38 @@ toe_complex = complex_design(complexes = [C1],
                              soft_constraints=my_soft_const,
                              options=my_options)
 
+
 toehold_complex = toe_complex.run(trials= Trials)
-'''''''''
-    # Test for stop codons
-stop_codons = ['UGA', 'UAA', 'UAG']
-test_region = i + linker
 
-    # Split the test region into codons to check one at a time
-    test_region_codons = [test_region[i:i + 3] for i in range(0, len(test_region), 3)]
 
-    # Loop through the list and check if there are any stop codons in this reading frame
-    for codon in test_region_codons:
-        # assert not codon in stop_codons, 'The generated switch contains a stop codon'
-        if codon in stop_codons:
-            print("Stop")
-            break
-    print(s)
-    s = mut_seq
-'''
 
-print(complement.reverse_complement())
+
+results_list = []
+
 for trials in range(Trials):
 
     Trigger = TargetStrand([trigger], name="Trigger")
     toeholdcomplex = toehold_complex[trials].to_analysis(C1)
-    print(toeholdcomplex)
-    toehold_dom = Domain(str(toeholdcomplex),
-                     name = "toehold_dom")
+
+    codon = rep_stop_codons(str(toeholdcomplex),StopCodons)
+
+    if codon[1]:
+        toeholdcomplex = codon[0]
+        #CodonOpt = codon[1]
+
+
+
+
+
+    toehold_dom = Domain(str(toeholdcomplex), name = "toehold_dom")
     toehold_strand = TargetStrand([toehold_dom], name = "toehold_strand")
 
     #Toehold-Trigger duplex
     trig_complex = TargetComplex([Trigger], 'U21', name="Trig_complex")
 
     Trig_Toe_struct = structure_define(miRNA, Loop, Linker)
-    print(Trig_Toe_struct)
-    C2 = TargetComplex([Trigger, toehold_strand],Trig_Toe_struct, name = "C2")
-    print(C2)
+
+    C2 = TargetComplex([Trigger, toehold_strand], Trig_Toe_struct, name = "C2")
 
     t_toe = TargetTube(on_targets={C2: 1e-06},
                        off_targets=SetSpec(max_size=2),
@@ -114,36 +117,85 @@ for trials in range(Trials):
                                  soft_constraints=my_soft_const,
                                  model=model1, options=my_options)
 
-    results= my_tube_design.run(trials=1)
+    tubetrials = 1
+
+    if codon[1]:
+        tubetrials = 5
+    results= my_tube_design.run(trials=tubetrials)
+
+    path_trial = (path + "/%s") % (trials)
+    os.makedirs(path_trial, exist_ok=True)
+
+    for tubetri in range(tubetrials):
+
+        switchfinal = results[tubetri].to_analysis(toehold_strand)
+
+        if rep_stop_codons(str(switchfinal), StopCodons)[1]:
+            print("Tube Design Version Failed - Stop Codon detected")
+            continue
+
+        binding = results[tubetri].to_analysis(C2)
+        triggerfinal = results[tubetri].to_analysis(Trigger)
+        my_mfe_trigswitch = mfe(strands=binding, model=model1)
+        my_mfe_switch = mfe(strands = switchfinal, model = model1)
+        my_mfe_trigger = mfe(strands=triggerfinal, model=model1)
+        my_mfe_rbslinker = mfe(strands=str(switchfinal)[29:], model=model1)
+        diff_mfe = my_mfe_trigswitch[0].energy - (my_mfe_trigger[0].energy + my_mfe_switch[0].energy)
+        print(my_mfe_switch[0].structure)
+
+        if not "."*15 in str(my_mfe_switch[0].structure)[:15]:
+            continue
+        print(my_mfe_trigswitch[0].structure)
+
+        print((my_mfe_trigswitch[0].structure).pairlist())
+
+        CodonOpt = "%d.%d" % (trials,tubetri)
+        print(my_mfe_switch[0].structure)
+        print(switchfinal)
+        print(CodonOpt)
 
 
-    binding = results[0].to_analysis(C2)
-    fullswitch_seq = results[0].to_analysis(toehold_strand)
+        path_versions = (path_trial + "/%s") % (CodonOpt)
+
+        os.makedirs(path_versions, exist_ok=True)
+
+        name_file = (path_versions + "/Toehold_%s.png") % (CodonOpt)
+        name_fasta = (path_versions + "/%s.fx") % (CodonOpt)
+
+        output_file = ">%s\n%s\n%s" % (CodonOpt, str(switchfinal), str(my_mfe_switch[0].structure))
 
 
-    #MFE
-    my_mfe_trigswitch = mfe(strands=binding, model=model1)
-    my_mfe_switch = mfe(strands=toeholdcomplex, model=model1)
-    my_mfe_trigger = mfe(strands=miRNA, model=model1)
-    my_mfe_rbslinker = mfe(strands=str(toeholdcomplex)[29:],
-                           model=model1)
-    #Append results
-    results_tab["miRNA.sequence"].append(miRNA)
-    results_tab["miRNA.Toehold.Complement"].append(str(Seq(mir_seq).reverse_complement()))
-    results_tab["Full.switch.seq"].append(str(fullswitch_seq))
-    results_tab["Switch.structure"].append(str(my_mfe_switch[0].structure))
-    results_tab["Trigger.structure"].append(str(my_mfe_trigger[0].structure))
-    results_tab["Full.TriggerSwitch.structure"].append(str(my_mfe_trigswitch[0].structure))
-    #result_tab["Trigger.mfe"]
+        with open(name_fasta, 'w') as f:
+            f.write(''.join(output_file))
 
 
-    #print('Partition function =', my_pfunc)
-    print(my_mfe_trigswitch[0].energy)
-    print(my_mfe_rbslinker[0].energy)
-    print(my_mfe_switch[0].energy)
-    print(my_mfe_trigger[0].energy)
-    print(my_mfe_trigswitch[0].energy - (my_mfe_trigger[0].energy + my_mfe_switch[0].energy))
-    print(my_mfe_trigswitch[0].structure)
-    print(str(Seq(miRNA).reverse_complement())[:-5])
 
+        cg = forgi.load_rna(name_fasta, allow_many=False)
+        fvm.plot_rna(cg, text_kwargs={"fontweight": "black"}, lighten=0.7,
+                     backbone_kwargs={"linewidth": 3})
+
+        fig = plt.gcf()
+        fig.savefig(name_file, dpi=100)
+        fig.clf()
+        #Append results
+        appends = [CodonOpt, miRNA,str(Seq(mir_seq).reverse_complement()), str(switchfinal),
+               str(my_mfe_switch[0].structure), str(my_mfe_trigger[0].structure),
+               str(my_mfe_trigswitch[0].structure),str(my_mfe_trigger[0].energy),
+               str(my_mfe_switch[0].energy), str(my_mfe_trigswitch[0].energy),
+               str(my_mfe_rbslinker[0].energy), str(diff_mfe)#, CodonOpt
+               ]
+        results_list.append(appends)
+
+results_tab = pd.DataFrame(results_list, columns=["Trial", "miRNA.sequence",
+                                                  "miRNA.Toehold.Complement", "Full.Toehold.seq",
+                                                  "Toehold.structure", "Trigger.structure",
+                                                  "Full.TriggerToehold.structure",
+                                                  "Trigger.energy", "Toehold.energy",
+                                                  "BindingToeholdTrigger.energy", "DeltaG_RBSLinker",
+                                                  "Diff_energy"]).set_index("Trial")
 print(results_tab)
+
+results_tab.to_csv(r'test_toehold1.csv',index = True, header = True)
+
+
+

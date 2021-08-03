@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
-
+from Bio.Seq import Seq
+from Bio import SeqIO
+from Bio.SeqRecord import SeqRecord
 
 #This function help to design toehold complement
 def displacement_miR(miRNA):
@@ -25,11 +27,15 @@ def structure_define(miRNA,loop,linker):
       return "(%d+)%d.3(5.%d)5.%d" % (paired, paired, Loop, Final)
 
 
-# creating the Results File
-results_tab = {"miRNA.sequence":[],
-               "miRNA.Toehold.Complement": [],
-               "Full.switch.seq": [],
-               "Switch.structure": [],
-               "Trigger.structure": [],
-               "Full.TriggerSwitch.structure": []
-               }
+def rep_stop_codons(record, codon_stop_array):
+    modify = False
+    tempRecordSeq = list(record)
+    for index in range(53, len(record), 3):
+        codon = record[index:index + 3]
+        if codon in codon_stop_array:
+            tempRecordSeq[index:index + 3] = 'V', 'N', 'N'
+            modify = True
+    record = "".join(tempRecordSeq)
+    return record, modify
+
+#def aval_binding(structure):

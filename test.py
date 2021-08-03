@@ -8,7 +8,7 @@ Trig_Toe_struct = "(21+.5)21.3(5.11)5.35"
 
 #Pattern Prevention
 Prevent = ['A4', 'C4', 'G4', 'U4', 'M6', 'K6', 'W6', 'S6', 'R6', 'Y6']
-
+StopCodons = ["UAG", "UGA", "UAA"]
 #Loop sequence
 Loop = "UAAUAAGGAGG" #ref https://microbialcellfactories.biomedcentral.com/track/pdf/10.1186/s12934-020-01404-2.pdf
 
@@ -27,5 +27,6 @@ miRNA = "UAAAUAUCAGCUGGUAAUUCU"
 
 #Linker
 Linker = "AACCUGGCGGCAGCGCAAAAG"
+#Linker =  "AUAGACGCGGCAGCGCAAAAG" test stop codons
 
 
