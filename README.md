@@ -41,7 +41,7 @@ Green et al.(2020) [2] e baseia seu funcinamento em NUPACK Design and Analysis a
 - Forgi v2.0.2
 - RNA v0.7.5
 
-##Getting Started
+## Getting Started
 
 ---
 
@@ -104,9 +104,12 @@ These sub-versions are stored in *version.sub-version* folders.
  - **.csv file**: All thermodynamic parameters, ensemble defects, sequences and structures information
 
 ###Limitations
-
+- Limited by the standardized structure at unpaired =11 and paired = 10
+- Slow for large libraries
+- The code does not contain the best toeholds score
 
 
 
 [1] J. N. Zadeh, C. D. Steenberg, J. S. Bois, B. R. Wolfe, M. B. Pierce, A. R. Khan, R. M. Dirks, N. A. Pierce. NUPACK: analysis and design of nucleic acid systems. J Comput Chem, 32:170–173, 2011. 
+
 [2] Green, A.A. et al. (2020). Complex cellular logic computation using ribocomputing devices. Nature, 548, p. 117-121. 
