@@ -24,7 +24,7 @@ def structure_define(miRNA,loop,linker,reporter,paired, unpaired):
     c_dom = "W5"
     d_dom = "N%d" % (paired)
 
-    aaa = Domain("AAA", name = "aaaa")
+    aaa = Domain("GGG", name = "aaaa")
     complement = Domain(miRNA, name = "complement")
     a = Domain(a_dom, name="a")
     b = Domain(b_dom, name="b")
@@ -36,6 +36,7 @@ def structure_define(miRNA,loop,linker,reporter,paired, unpaired):
     #Reporter_dom = Domain(reporter, name="Reporter_dom")
 
     Domains = [aaa, ~complement, a, b, Loop, c, start, d , Linker_dom]
+    print(Domains)
     #Prevent1 = Pattern(["UAG", "UGA", "UAA"], scope = [d])
     Prevent2 = Pattern(['A4', 'C4', 'G4', 'U4', 'M6', 'K6', 'W6', 'S6', 'R6', 'Y6'])
     soft_cons = [Prevent2]

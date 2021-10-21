@@ -81,7 +81,7 @@ for trials in range(Trials):
     Trigger = TargetStrand([trigger], name="Trigger")
     toeholdcomplex = toehold_complex[trials].to_analysis(C1)
     codon = rep_stop_codons(str(toeholdcomplex), Structure_def[3],StopCodons)
-
+    print(toeholdcomplex)
     if codon[1]:               #replace stop codons by "VNN"
         toeholdcomplex = codon[0]
 
@@ -117,7 +117,7 @@ for trials in range(Trials):
     for tubetri in range(tubetrials):
 
         switchfinal = results[tubetri].to_analysis(toehold_strand)
-
+        print(".")
         #Re-evaluates the presence of stop codons
         if rep_stop_codons(str(switchfinal), Structure_def[3], StopCodons)[1]:
             print("Tube Design Version Failed - Stop Codon detected")
@@ -138,13 +138,14 @@ for trials in range(Trials):
         diff_mfe = my_mfe_trigswitch[0].energy - (my_mfe_trigger[0].energy + my_mfe_switch[0].energy)
 
 
-        if not "."*(unpaired+3) in str(my_mfe_switch[0].structure)[:unpaired+3]:
-            continue
+        #if not "."*(unpaired+3) in str(my_mfe_switch[0].structure)[:unpaired+3]:
+         #   print("-")
+        #    continue
 
         CodonOpt = "%d.%d" % (trials,tubetri)
 
         sampled_structures = sample(strands=[str(switchfinal)], num_sample=1, model=model1)
-
+        print(sampled_structures)
 
         ensemble_defect_binding = defect(strands=[miRNA,str(switchfinal)[:51]], structure='(21+.3)21.3(5.11)5.3', model=model1)
         ensemble_defect_complex = defect(strands= [str(switchfinal)], structure=str(my_mfe_switch[0].structure), model=model1)
@@ -159,7 +160,7 @@ for trials in range(Trials):
         print("trigger")
         print(ensemble_defect_trigger)
 
-        score = 5*ensemble_defect_trigger + 4*ensemble_defect_toeholddom + 3*ensemble_defect_complex + 1*ensemble_defect_binding
+        #score = 5*ensemble_defect_trigger + 4*ensemble_defect_toeholddom + 3*ensemble_defect_complex + 1*ensemble_defect_binding
         path_versions = (path_trial + "/%s") % (CodonOpt)
 
         os.makedirs(path_versions, exist_ok=True)
@@ -178,7 +179,7 @@ for trials in range(Trials):
                str(my_mfe_trigswitch[0].structure),str(my_mfe_trigger[0].energy),
                str(my_mfe_switch[0].energy), str(my_mfe_trigswitch[0].energy),
                str(my_mfe_rbslinker[0].energy), str(diff_mfe), ensemble_defect_complex,
-                   ensemble_defect_binding, score #, CodonOpt
+                   ensemble_defect_binding #, CodonOpt
                ]
         results_list.append(appends)
 
@@ -188,10 +189,10 @@ results_tab = pd.DataFrame(results_list, columns=["Trial", "miRNA.sequence",
                                                   "Full.TriggerToehold.structure",
                                                   "Trigger.energy", "Toehold.energy",
                                                   "BindingToeholdTrigger.energy", "DeltaG_RBSLinker",
-                                                  "Diff_energy", "ensemble_defect_complex", "ensemble_defect_binding", "Score"]).set_index("Trial")
+                                                  "Diff_energy", "ensemble_defect_complex", "ensemble_defect_binding"]).set_index("Trial")
 print(results_tab)
 
-results_tab.to_csv(r'test_toehold1.csv',index = True, header = True)
-
+results_tab.to_csv(r'Toehold_output_RBS_Bsubtilis.csv',index = True, header = True)
+print("Saved and Finished")
 
 

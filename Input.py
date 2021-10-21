@@ -16,7 +16,7 @@ StopCodons = ["UAG", "UGA", "UAA"] #Avoiding Stop Codons
 Loop = "UAAUAAGGAGG" #ref RBS for bacillus subtilis https://microbialcellfactories.biomedcentral.com/track/pdf/10.1186/s12934-020-01404-2.pdf
 
 #Trials
-Trials = 10                #Trials to generate Toehold
+Trials = 5                #Trials to generate Toehold
 Trials_stop = 2            #Trials to generate Toehold with tube design after stopcodon replacement
 
 #Conditions/Model
