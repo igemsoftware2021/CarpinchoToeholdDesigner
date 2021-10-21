@@ -93,7 +93,7 @@ You can fill the inputs for your Toehold Design preferences in th Input.py file.
 After installation and running, Carpincho Tool saves each version in a folder that contains subversions if there are stop-codons (Trials_stop). 
 These sub-versions are stored in *version.sub-version* folders.
 
-###Output Files
+### Output Files
  - **Binding_Toehold_Trigger.fx**: Trigger+Toehold sequence and Structure notation;
  - **Toehold_version.fx**: Toehold sequence and Structure notation;
  - **Toehold_version_struct.png**: Toehold conformation from ViennaRNA package[3];
