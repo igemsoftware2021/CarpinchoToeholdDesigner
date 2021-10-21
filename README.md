@@ -103,7 +103,11 @@ These sub-versions are stored in *version.sub-version* folders.
  - **Toehold_version_probab_Theory.png**: Pair probabilities for Toehold Structure in theory
  - **.csv file**: All thermodynamic parameters, ensemble defects, sequences and structures information
 
-###Limitations
+###Results
+ResultsToehold_Bs_RBS.zip shows an example of output files. This Toehold were designed for B. subtilis to detect miR-283
+
+
+### Limitations
 - Limited by the standardized structure at unpaired =11 and paired = 10
 - Slow for large libraries
 - The code does not contain the best toeholds score
