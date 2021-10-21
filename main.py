@@ -1,21 +1,27 @@
 
+########################### GETTING START########################################
+######## Download the NUPACK package using the command:
+######## python3 -m pip install -U nupack -f ~/Downloads/nupack-4.0.0.27/package
+######## for more information go to: https://docs.nupack.org/start/
+#################################################################################
 
-#terminal
-#python3 -m pip install -U nupack -f ~/Downloads/nupack-4.0.0.27/package
 
-#Import libraries
-from Bio.Seq import Seq
-from nupack import *
+
+########################## Import Libraries ##################################
+from Bio.Seq import Seq                    #v1.79
+from nupack import *                       #v4.0.027
+import numpy as np                         #v1.21.1
+from random import randint                 #-
+import pandas as pd                        #v1.3.1
+import matplotlib.pyplot as plt            #v3.4.2
+import forgi.visual.mplotlib as fvm        #v2.0.2
+import forgi                               #v2.0.2
+import RNA                                 #v0.7.5
+import os                                  #-
+
+#Import secondary commands
 from Input import *
 from helper import *
-import numpy as np
-from random import randint
-import pandas as pd
-import matplotlib.pyplot as plt
-import forgi.visual.mplotlib as fvm
-import forgi
-import RNA
-import os
 
 #Create Results folder
 path = (PATH + "/ResultsToehold")
@@ -23,12 +29,22 @@ os.makedirs(path, exist_ok=True)
 
 
 #Design Conditions
+#Experiment conditions from  input file
+
+#Design option specify any non-default job option from previous Wolfe17 paper
+# (see more here: https://docs.nupack.org/design/#job-options)
+#The Wobble option allows you to set whether the design will follow WATSON-CRICK base pair rules
+
 my_options = DesignOptions(f_stop=0.01,
                            seed=0,
                            wobble_mutations= Wobble)
 
-my_soft_const = [Pattern(Prevent)]
+#Setting soft constrainst is an alternative to hard constraint
+# which prohibits certain pattern violations
+# (such as equal sequences), in which case the constraints are "softer".
+# For more information: https://docs.nupack.org/design/#specify-soft-constraints
 
+my_soft_const = [Pattern(Prevent)]
 
 model1 = Model(material = Material,
                celsius= T,
@@ -37,6 +53,10 @@ model1 = Model(material = Material,
 
 
 # Create Toehold Switch Complex
+#First define the domains that are part of the toehold structure
+# and then generate the re-designed toehold determined by the sequence
+# and structure in TargetComplex.
+
 Structure_def = structure_define(miRNA, Loop, Linker, Reporter, paired, unpaired)
 
 toe_strand = TargetStrand(Structure_def[2], name='Toehold')
@@ -45,13 +65,15 @@ C1 = TargetComplex([toe_strand], Structure_def[0], name="C1")
 
 toe_complex = complex_design(complexes = [C1],
                              model=model1,
-                             soft_constraints=Structure_def[4],
+                             soft_constraints=my_soft_const,
                              options=my_options)
 
 toehold_complex = toe_complex.run(trials= Trials)
 
+
 #Stop codons identification and replacing in tube design trials
 results_list = []
+
 for trials in range(Trials):
 
 
@@ -62,8 +84,9 @@ for trials in range(Trials):
 
     if codon[1]:               #replace stop codons by "VNN"
         toeholdcomplex = codon[0]
-        #CodonOpt = codon[1]
-        print(toeholdcomplex)
+
+    #Create TargetStrand to run test tube design
+    # and optimizate the stop codon replaced
 
     toehold_dom = Domain(str(toeholdcomplex), name = "toehold_dom")
     toehold_strand = TargetStrand([toehold_dom], name = "toehold_strand")
@@ -79,13 +102,15 @@ for trials in range(Trials):
                                  soft_constraints=my_soft_const,
                                  model=model1, options=my_options)
 
+    #if have replaced stop codon, run more 10 times
     tubetrials = 1
 
     if codon[1]:
-        tubetrials = 5
+        tubetrials = Trials_stop
 
     results= my_tube_design.run(trials=tubetrials)
 
+    #Define file name and directory
     path_trial = (path + "/%s") % (trials)
     os.makedirs(path_trial, exist_ok=True)
 
@@ -93,6 +118,7 @@ for trials in range(Trials):
 
         switchfinal = results[tubetri].to_analysis(toehold_strand)
 
+        #Re-evaluates the presence of stop codons
         if rep_stop_codons(str(switchfinal), Structure_def[3], StopCodons)[1]:
             print("Tube Design Version Failed - Stop Codon detected")
             continue
@@ -100,23 +126,26 @@ for trials in range(Trials):
         binding = results[tubetri].to_analysis(C2)
         triggerfinal = results[tubetri].to_analysis(Trigger)
 
+        #Get MFE values for binding trigger-toehold, toehold, trigger and RBS-linker
         my_mfe_trigswitch = mfe(strands=binding, model=model1)
         my_mfe_switch = mfe(strands = switchfinal, model = model1)
         my_mfe_trigger = mfe(strands=triggerfinal, model=model1)
         my_mfe_rbslinker = mfe(strands=str(switchfinal)[paired+unpaired+8:], model=model1)
 
         #my_complex_ensemble_defect = defect(strands=[switchfinal], structure= Structure_def[0], model = model1)
+
+        #Difference between Binding MFE and the sum of unbound trigger and toehold energies
         diff_mfe = my_mfe_trigswitch[0].energy - (my_mfe_trigger[0].energy + my_mfe_switch[0].energy)
 
-        #if not "."*15 in str(my_mfe_switch[0].structure)[:15]:
-         #   continue
+
+        if not "."*(unpaired+3) in str(my_mfe_switch[0].structure)[:unpaired+3]:
+            continue
 
         CodonOpt = "%d.%d" % (trials,tubetri)
-        print(CodonOpt)
-        print(results[tubetri].defects.ensemble_defect)
-        print(switchfinal)
+
         sampled_structures = sample(strands=[str(switchfinal)], num_sample=1, model=model1)
-        print(sampled_structures)
+
+
         ensemble_defect_binding = defect(strands=[miRNA,str(switchfinal)[:51]], structure='(21+.3)21.3(5.11)5.3', model=model1)
         ensemble_defect_complex = defect(strands= [str(switchfinal)], structure=str(my_mfe_switch[0].structure), model=model1)
         ensemble_defect_toeholddom = defect(strands=[str(switchfinal)[3:13]], structure = '.10', model=model1)

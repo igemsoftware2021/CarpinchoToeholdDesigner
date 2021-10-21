@@ -1,31 +1,32 @@
 
+# Input information for the Toehold design
 
-structure_type = "c"     # a_series | b_series
 
-paired = 11
-unpaired = 10
-#structure
-#Toehold_structure = 'U15 D11(U3 D5 U11 U3) U6 D3 U4 U5'
-#Trigger_Toehold_structure = "(21+.5)21.3(5.11)5.35"
+paired = 11                #Number of paired nucleotides (see readme for more information)
+unpaired = 10              #Number of unpaired nucleotides
+
+
 
 #Pattern Prevention
-Prevent = ['A4', 'C4', 'G4', 'U4', 'M6', 'K6', 'W6', 'S6', 'R6', 'Y6']
+Prevent = ['A4', 'C4', 'G4', 'U4', 'M6', 'K6', 'W6', 'S6', 'R6', 'Y6']   #Avoiding Sequence patterns
+StopCodons = ["UAG", "UGA", "UAA"] #Avoiding Stop Codons
 
-StopCodons = ["UAG", "UGA", "UAA"]
-#Loop sequence
-Loop = "UAAUAAGGAGG" #ref https://microbialcellfactories.biomedcentral.com/track/pdf/10.1186/s12934-020-01404-2.pdf
+
+#Spacers and RBS
+Loop = "UAAUAAGGAGG" #ref RBS for bacillus subtilis https://microbialcellfactories.biomedcentral.com/track/pdf/10.1186/s12934-020-01404-2.pdf
 
 #Trials
-Trials = 10
+Trials = 10                #Trials to generate Toehold
+Trials_stop = 2            #Trials to generate Toehold with tube design after stopcodon replacement
 
 #Conditions/Model
 Material = "rna95"
 T = 37
 Sodium = 1.0
 Magnesium = 0.0
-Wobble = True #True/False - do not follow WATSON-CRICK base pair rules
+Wobble = True #True- do not follow WATSON-CRICK base pair rules
 
-#miR
+#miR to detect
 miRNA = "UAAAUAUCAGCUGGUAAUUCU"
 
 #Linker and Reporter

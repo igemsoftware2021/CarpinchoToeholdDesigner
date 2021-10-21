@@ -9,19 +9,7 @@ import forgi.visual.mplotlib as fvm
 import forgi
 import RNA
 
-#This function help to design toehold complement
-def displacement_miR(miRNA,type):
-    length = len(miRNA)
-    if type == "c":
-        remain = 26 - length
-    elif type == "a2":
-        remain = 30 - length
-    elif type == "a1":
-        remain = 30 - length
 
-    if remain < 0:
-        return miRNA[:remain] , 0
-    return miRNA, remain
 
 #Modify secondary structure Toehold-Trigger prediction
 def structure_define(miRNA,loop,linker,reporter,paired, unpaired):
@@ -36,7 +24,7 @@ def structure_define(miRNA,loop,linker,reporter,paired, unpaired):
     c_dom = "W5"
     d_dom = "N%d" % (paired)
 
-    aaa = Domain("AAA", name = "ggg")
+    aaa = Domain("AAA", name = "aaaa")
     complement = Domain(miRNA, name = "complement")
     a = Domain(a_dom, name="a")
     b = Domain(b_dom, name="b")
