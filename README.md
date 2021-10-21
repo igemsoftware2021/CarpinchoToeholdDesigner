@@ -103,7 +103,7 @@ These sub-versions are stored in *version.sub-version* folders.
  - **Toehold_version_probab_Theory.png**: Pair probabilities for Toehold Structure in theory
  - **.csv file**: All thermodynamic parameters, ensemble defects, sequences and structures information
 
-###Results
+### Results files
 ResultsToehold_Bs_RBS.zip shows an example of output files. This Toehold were designed for B. subtilis to detect miR-283
 
 
