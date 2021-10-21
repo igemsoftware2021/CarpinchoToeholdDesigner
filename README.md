@@ -117,3 +117,5 @@ ResultsToehold_Bs_RBS.zip shows an example of output files. This Toehold were de
 [1] J. N. Zadeh, C. D. Steenberg, J. S. Bois, B. R. Wolfe, M. B. Pierce, A. R. Khan, R. M. Dirks, N. A. Pierce. NUPACK: analysis and design of nucleic acid systems. J Comput Chem, 32:170–173, 2011. 
 
 [2] Green, A.A. et al. (2020). Complex cellular logic computation using ribocomputing devices. Nature, 548, p. 117-121. 
+[3] Lorenz, Ronny and Bernhart, Stephan H. and Höner zu Siederdissen, Christian and Tafer, Hakim and Flamm, Christoph and Stadler, Peter F. and Hofacker, Ivo L.
+ViennaRNA Package 2.0. Algorithms for Molecular Biology, 6:1 26, 2011, doi:10.1186/1748-7188-6-26
