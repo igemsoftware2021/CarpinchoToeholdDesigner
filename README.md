@@ -9,7 +9,7 @@ NUPACK package[1]. The program was built as part of the BioPank
 project for the iGEM 2021 Contest. The iGEM UNILA_LatAm 
 implemented this code to design adapted Toeholds for 
 _Bacillus subtilis_ in the detection of miRNAs acquired from 
-the extracellular environment.
+the extracellular environment in the _Lutzmyia longipalpis_ midgut (miR-283).
 
 The project was uploaded on GitHub because of iGEM’s rule
 
