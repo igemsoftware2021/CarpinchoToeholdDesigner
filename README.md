@@ -2,7 +2,7 @@
 
 ---
 <h4 align="center"> 
-	🚧  To be improved... (See limitations) 🚧
+	🚧  In construction... (See limitations) 🚧
 </h4>
 This repository contains the code for Toehold Design based on the 
 NUPACK package[1]. The program was built as part of the BioPank 
